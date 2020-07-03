@@ -54,3 +54,9 @@ export const Footer = styled.section`
     }
   }
 `;
+
+export const Error = styled.p`
+  text-align: right;
+  margin-top: 20px;
+  color: #e83f5b;
+`;

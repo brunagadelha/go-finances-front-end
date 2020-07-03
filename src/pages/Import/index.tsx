@@ -7,7 +7,7 @@ import Header from '../../components/Header';
 import FileList from '../../components/FileList';
 import Upload from '../../components/Upload';
 
-import { Container, Title, ImportFileContainer, Footer } from './styles';
+import { Container, Title, ImportFileContainer, Footer, Error } from './styles';
 
 import alert from '../../assets/alert.svg';
 import api from '../../services/api';
@@ -20,22 +20,34 @@ interface FileProps {
 
 const Import: React.FC = () => {
   const [uploadedFiles, setUploadedFiles] = useState<FileProps[]>([]);
+  const [errorMessage, setErrorMessage] = useState('');
   const history = useHistory();
 
   async function handleUpload(): Promise<void> {
-    // const data = new FormData();
+    const data = new FormData();
 
-    // TODO
+    uploadedFiles.forEach(uploadedFile => {
+      data.append('file', uploadedFile.file);
+    });
 
     try {
-      // await api.post('/transactions/import', data);
+      await api.post('/transactions/import', data);
+      setErrorMessage('');
+      history.goBack();
     } catch (err) {
-      // console.log(err.response.error);
+      setErrorMessage('Saldo insuficiente');
     }
   }
 
   function submitFile(files: File[]): void {
-    // TODO
+    files.forEach(file => {
+      const uploadedFile: FileProps = {
+        file,
+        name: file.name,
+        readableSize: filesize(file.size),
+      };
+      setUploadedFiles([...uploadedFiles, uploadedFile]);
+    });
   }
 
   return (
@@ -56,6 +68,7 @@ const Import: React.FC = () => {
               Enviar
             </button>
           </Footer>
+          {errorMessage && <Error>{errorMessage}</Error>}
         </ImportFileContainer>
       </Container>
     </>
